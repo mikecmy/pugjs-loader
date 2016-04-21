@@ -1,6 +1,6 @@
 {
   "name": "pugjs-loader",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "author": "Tobias Koppers @sokra",
   "description": "pug(was jade) loader module for webpack",
   "dependencies": {
