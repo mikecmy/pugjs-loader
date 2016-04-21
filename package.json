@@ -1,13 +1,13 @@
 {
-  "name": "jade-loader",
+  "name": "pug-loader",
   "version": "0.8.0",
   "author": "Tobias Koppers @sokra",
-  "description": "jade loader module for webpack",
+  "description": "pug(was jade) loader module for webpack",
   "dependencies": {
     "loader-utils": "~0.2.5"
   },
   "peerDependencies": {
-    "jade": "^1.7.0"
+    "pug": "^1.11.0"
   },
   "devDependencies": {
     "mocha": "*",

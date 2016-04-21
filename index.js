@@ -8,11 +8,11 @@ var loaderUtils = require("loader-utils");
 
 module.exports = function(source) {
 	this.cacheable && this.cacheable();
-	var jade = require("jade");
+	var pug = require("pug");
 
-	var utils = require("jade/lib/utils");
-	var nodes = require("jade/lib/nodes");
-	var filters = require("jade/lib/filters");
+	var utils = require("pug/lib/utils");
+	var nodes = require("pug/lib/nodes");
+	var filters = require("pug/lib/filters");
 
 	var req = loaderUtils.getRemainingRequest(this).replace(/^!/, "");
 
@@ -27,9 +27,9 @@ module.exports = function(source) {
 	var filePaths = {};
 	function MyParser(str, filename, options) {
 		this._mustBeInlined = false;
-		jade.Parser.call(this, str, filename, options);
+		pug.Parser.call(this, str, filename, options);
 	}
-	MyParser.prototype = Object.create(jade.Parser.prototype);
+	MyParser.prototype = Object.create(pug.Parser.prototype);
 	MyParser.prototype.constructor = MyParser;
 
 	var missingFileMode = false;
@@ -39,7 +39,7 @@ module.exports = function(source) {
 		var filePath = filePaths[context + " " + request];
 		if(filePath) return filePath;
 		var isSync = true;
-		resolve(context, request + ".jade", function(err, _request) {
+		resolve(context, request + ".pug", function(err, _request) {
 			if(err) {
 				resolve(context, request, function(err2, _request) {
 					if(err2) return callback(err2);
@@ -78,22 +78,22 @@ module.exports = function(source) {
 
 	MyParser.prototype.parseMixin = function() {
 		this._mustBeInlined = true;
-		return jade.Parser.prototype.parseMixin.call(this);
+		return pug.Parser.prototype.parseMixin.call(this);
 	};
 
 	MyParser.prototype.parseBlock = function() {
 		this._mustBeInlined = true;
-		return jade.Parser.prototype.parseBlock.call(this);
+		return pug.Parser.prototype.parseBlock.call(this);
 	};
 
 	MyParser.prototype.parseCall = function() {
 		this._mustBeInlined = true;
-		return jade.Parser.prototype.parseCall.call(this);
+		return pug.Parser.prototype.parseCall.call(this);
 	};
 
 	MyParser.prototype.parseExtends = function() {
 		if(!callback) callback = loaderContext.async();
-		if(!callback) return jade.Parser.prototype.parseExtends.call(this);
+		if(!callback) return pug.Parser.prototype.parseExtends.call(this);
 
 		var request = this.expect('extends').val.trim();
 		var context = dirname(this.filename.split("!").pop());
@@ -111,7 +111,7 @@ module.exports = function(source) {
 
 	MyParser.prototype.parseInclude = function() {
 		if(!callback) callback = loaderContext.async();
-		if(!callback) return jade.Parser.prototype.parseInclude.call(this);
+		if(!callback) return pug.Parser.prototype.parseInclude.call(this);
 
 		var tok = this.expect('include');
 
@@ -133,8 +133,8 @@ module.exports = function(source) {
 			return new nodes.Literal(str);
 		}
 
-		// non-jade
-		if ('.jade' != path.substr(-5)) {
+		// non-pug
+		if ('.pug' != path.substr(-5)) {
 			var str = str.replace(/\r/g, '');
 			return new nodes.Literal(str);
 		}
@@ -167,7 +167,7 @@ module.exports = function(source) {
 	run();
 	function run() {
 		try {
-			var tmplFunc = jade.compileClient(source, {
+			var tmplFunc = pug.compileClient(source, {
 				parser: loadModule ? MyParser : undefined,
 				filename: req,
 				self: query.self,
@@ -185,7 +185,7 @@ module.exports = function(source) {
 			}
 			throw e;
 		}
-		var runtime = "var jade = require("+JSON.stringify(require.resolve("jade/lib/runtime"))+");\n\n";
+		var runtime = "var pug = require("+JSON.stringify(require.resolve("pug/lib/runtime"))+");\n\n";
 		loaderContext.callback(null, runtime + "module.exports = " + tmplFunc.toString());
 	}
 }
